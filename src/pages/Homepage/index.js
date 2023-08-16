@@ -13,8 +13,6 @@ function Homepage() {
   const searchText = useSelector((state) => state.search.searchText);
   const products = useSelector((state) => state.product.products);
 
-  const dispatch = useDispatch();
-
   const [allProducts, setAllProducts] = useState([]);
   const [listingProducts, setListingProducts] = useState([]);
   const [models, setModels] = useState([]);
@@ -24,8 +22,8 @@ function Homepage() {
   const [filteredBrands, setFilteredBrands] = useState([]);
   const [checkedBrand, setCheckedBrand] = useState([]);
   const [selectedSort, setSelectedSort] = useState("");
-  const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
+  console.log(listingProducts);
 
   useEffect(() => {
     setAllProducts(products);
@@ -37,6 +35,13 @@ function Homepage() {
     setModels(modelGroup);
     setFilteredModels(modelGroup);
   }, [products]);
+
+  useEffect(() => {
+    if (listingProducts.length === 0 && products.length > 0) {
+      setListingProducts(products);
+      setAllProducts(products);
+    }
+  }, [listingProducts, products]);
 
   const searchOnChange = (e, type) => {
     if (type === "brand") {
@@ -256,40 +261,36 @@ function Homepage() {
         </div>
       </div>
       <div className="col-7 col-md-6">
-        {loading ? (
-          <FadeLoader color="#36d7b7" />
-        ) : (
-          <>
-            <div className="row align-items-stretch row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-2">
-              {[...listingProducts].splice(page * 12, 12).map((item, index) => {
-                return <ProductCard key={index} product={item} />;
-              })}
-            </div>
-            <ReactPaginate
-              containerClassName="pagination"
-              activeClassName="active"
-              previousLabel="<"
-              nextLabel=">"
-              pageClassName="page-item"
-              pageLinkClassName="page-link"
-              previousClassName="page-item"
-              previousLinkClassName="page-link"
-              nextClassName="page-item"
-              nextLinkClassName="page-link"
-              breakLabel="..."
-              breakClassName="page-item"
-              breakLinkClassName="page-link"
-              pageRangeDisplayed={2}
-              marginPagesDisplayed={2}
-              onPageChange={(e) => {
-                setPage(e.selected);
-              }}
-              forcePage={page}
-              pageCount={Math.ceil(listingProducts.length / 12)}
-              renderOnZeroPageCount={null}
-            />
-          </>
-        )}
+        <>
+          <div className="row align-items-stretch row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-2">
+            {[...listingProducts].splice(page * 12, 12).map((item, index) => {
+              return <ProductCard key={index} product={item} />;
+            })}
+          </div>
+          <ReactPaginate
+            containerClassName="pagination"
+            activeClassName="active"
+            previousLabel="<"
+            nextLabel=">"
+            pageClassName="page-item"
+            pageLinkClassName="page-link"
+            previousClassName="page-item"
+            previousLinkClassName="page-link"
+            nextClassName="page-item"
+            nextLinkClassName="page-link"
+            breakLabel="..."
+            breakClassName="page-item"
+            breakLinkClassName="page-link"
+            pageRangeDisplayed={2}
+            marginPagesDisplayed={2}
+            onPageChange={(e) => {
+              setPage(e.selected);
+            }}
+            forcePage={page}
+            pageCount={Math.ceil(listingProducts.length / 12)}
+            renderOnZeroPageCount={null}
+          />
+        </>
       </div>
     </>
   );
